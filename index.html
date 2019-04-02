@@ -67,7 +67,7 @@
 											<a onclick="accordion(this)" class="btn btn-primary">－</a>
 											{{ rank2Index + 1 }} - {{rank2.title || "未設定大標題"}}
 											<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-												<a v-if="!copy" @click="copyRank2(rank1Index, rank2Index)" class="btn btn-info">copy</a>
+												<a @click="copyRank2(rank1Index, rank2Index)" class="btn btn-info">copy</a>
 												<a v-if="copy" @click="replaceRank2(rank1Index, rank2Index)" class="btn btn-success">replace</a>
 												<a @click="deleteRank2(rank1Index, rank2Index)" class="btn btn-danger float-right">Ｘ</a>
 											</div>
