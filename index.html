@@ -183,7 +183,7 @@
 				if (typeof performance !== "undefined" && typeof performance.now === "function"){
 					d += performance.now(); //use high-precision timer if available
 				}
-				return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+				return "xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
 					let r = (d + Math.random() * 16) % 16 | 0;
 					d = Math.floor(d / 16);
 					return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
@@ -291,14 +291,23 @@
 						this.copy = false;
 					},
 					deleteRank1: function(rank1Index) {
+						if (this.rank1List.length === 1) return;
 						this.rank1List.splice(rank1Index, 1);
 					},
 					deleteRank2: function(rank1Index, rank2Index) {
+						if (this.rank1List[
+							rank1Index
+						].rank2List.length === 1) return;
 						this.rank1List[
 							rank1Index
 						].rank2List.splice(rank2Index, 1);
 					},
 					deleteRank3: function(rank1Index, rank2Index, rank3Index) {
+						if (this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						].rank3List.length === 1) return;
 						this.rank1List[
 							rank1Index
 						].rank2List[
@@ -306,6 +315,13 @@
 						].rank3List.splice(rank3Index, 1);
 					},
 					deleteRank4: function(rank1Index, rank2Index, rank3Index, rank4Index) {
+						if (this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						].rank3List[
+							rank3Index
+						].rank4List.length === 1) return;
 						this.rank1List[
 							rank1Index
 						].rank2List[
@@ -341,6 +357,10 @@
 						showError(idElemanets[index], "題目代號重複或空白");
 						return false;
 					}
+					if (!/^[_A-Za-z0-9]+$/.test(idElemanets[index].value)) {
+						showError(idElemanets[index], "題目代號只能是英文與數字");
+						return false;
+					}
 					idElemanets[index].classList.remove("is-invalid");
 					hash[idElemanets[index].value] = true;
 					if (!idElemanets[index].classList.contains("rankIdElement")) {
@@ -352,6 +372,11 @@
 				for (let index = 0; index < length; index++) {
 					if (!rank3Hash[idElemanets[index].value] && idElemanets[index].value !== "") {
 						showError(idElemanets[index], "依賴題目代號不存在");
+						return false;
+					}
+					let ownId = idElemanets[index].parentNode.parentNode.parentNode.getElementsByClassName("idElement")[0].value;
+					if (ownId === idElemanets[index].value) {
+						showError(idElemanets[index], "依賴題目不得為自己");
 						return false;
 					}
 					idElemanets[index].classList.remove("is-invalid");
