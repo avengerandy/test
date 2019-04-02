@@ -1,0 +1,349 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-accordion=1, shrink-to-fit=no">
+		<meta name="author" content="MazeR">
+		<title>Json</title>
+		<!-- development version, includes helpful console warnings -->
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<style>
+			.footer {
+				background-color: #e9ecef;
+				padding-top: 4rem;
+				padding-bottom: 4rem;
+				margin-top: 2rem;
+			}
+			.uploadLabel {
+				border-width: medium;
+				border-color: gray;
+				border-style: dashed;
+				border-radius: 10px;
+				padding: 20px;
+			}
+		</style>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	</head>
+	<body>
+		<div class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-8">
+						<h1 class="display-4">Questionnaire Core Generator</h1>
+						<p class="lead">A json generator that follow specific format.</p>
+					</div>
+					<label for="jsonUpload" class="uploadLabel">
+						<div class="col">
+							open json file
+							<input type="file" accept="text/json" class="form-control-file" id="jsonUpload" onchange="loadJson(this.files[0])">
+						</div>
+					</label>
+				</div>
+			</div>
+		</div>
+		<div class="container" id="root">
+			<div class="row">
+				<div class="col-12">
+					<div class="card" v-for="(rank1, rank1Index) in rank1List">
+						<div class="card-header">
+							<a onclick="accordion(this)" class="btn btn-primary">－</a>
+							{{ rank1Index + 1 }} - {{rank1.name || "未設定區間名稱"}}
+							<a @click="deleteRank1(rank1Index)" class="btn btn-danger float-right">Ｘ</a>
+						</div>
+						<div class="card-body">
+							<div class="form-row form-group">
+								<div class="col">
+									<label>名稱</label>
+									<input type="text" class="form-control" placeholder="區間名稱" v-model="rank1.name">
+								</div>
+								<div class="col">
+									<label>代號</label>
+									<input type="text" class="form-control idElement" placeholder="id" v-model="rank1.id">
+								</div>
+							</div>
+							<div class="row justify-content-end">
+								<div class="col-11">
+									<div class="card" v-for="(rank2, rank2Index) in rank1.rank2List">
+										<div class="card-header">
+											<a onclick="accordion(this)" class="btn btn-primary">－</a>
+											{{ rank2Index + 1 }} - {{rank2.title || "未設定大標題"}}
+											<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+												<a v-if="!copy" @click="copyRank2(rank1Index, rank2Index)" class="btn btn-info">copy</a>
+												<a v-if="copy" @click="replaceRank2(rank1Index, rank2Index)" class="btn btn-success">replace</a>
+												<a @click="deleteRank2(rank1Index, rank2Index)" class="btn btn-danger float-right">Ｘ</a>
+											</div>
+										</div>
+										<div class="card-body">
+											<div class="form-row form-group">
+												<div class="col">
+													<label>大標題</label>
+													<input type="text" class="form-control" placeholder="中文標題" v-model="rank2.title">
+												</div>
+											</div>
+											<div class="row justify-content-end">
+												<div class="col-10">
+													<div class="card" v-for="(rank3, rank3Index) in rank2.rank3List">
+														<div class="card-header">
+															<a onclick="accordion(this)" class="btn btn-primary">－</a>
+															{{ rank3Index + 1 }} - {{rank3.question || "未設定問題"}}
+															<a @click="deleteRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-danger float-right">Ｘ</a>
+														</div>
+														<div class="card-body">
+															<div class="form-row form-group">
+																<div class="col-10">
+																	<label>標題</label>
+																	<input type="text" class="form-control" placeholder="問題" v-model="rank3.question">
+																</div>
+																<div class="col">
+																	<label>代號</label>
+																	<input type="text" class="form-control idElement" placeholder="id" v-model="rank3.id">
+																</div>
+															</div>
+															<div class="form-row form-group justify-content-end">
+																<div class="col-8">
+																	<label>選項</label>
+																</div>
+																<div class="col-2">
+																	<label>分數</label>
+																</div>
+																<div class="col-1"></div>
+															</div>
+															<div class="form-row form-group justify-content-end" v-for="(rank4, rank4Index) in rank3.rank4List">
+																<div class="col-8">
+																	<input type="text" class="form-control" placeholder="選項" v-model="rank4.option">
+																</div>
+																<div class="col-2">
+																	<input type="number" class="form-control" placeholder="score" v-model.number="rank4.score">
+																</div>
+																<div class="col-1">
+																	<a @click="deleteRank4(rank1Index, rank2Index, rank3Index, rank4Index)" class="btn btn-danger float-right">Ｘ</a>
+																</div>
+															</div>
+															<div class="row justify-content-end">
+																<div class="col-11">
+																	<a @click="addRank4(rank1Index, rank2Index, rank3Index)" class="btn btn-primary btn-block">＋</a>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row justify-content-end">
+												<div class="col-10">
+													<a @click="addRank3(rank1Index, rank2Index)" class="btn btn-primary btn-block">＋</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row justify-content-end">
+								<div class="col-11">
+									<a @click="addRank2(rank1Index)" class="btn btn-primary btn-block">＋</a>
+								</div>
+							</div>
+						</div>
+					</div>				
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<a @click="addRank1" class="btn btn-primary btn-block">＋</a>
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid footer">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<a onclick="outputJson()" class="btn btn-primary float-right">output</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
+			let copyTemp = getDefaultRank3Json();
+
+			function uuidGenerator() {
+				let d = Date.now();
+				if (typeof performance !== "undefined" && typeof performance.now === "function"){
+					d += performance.now(); //use high-precision timer if available
+				}
+				return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+					let r = (d + Math.random() * 16) % 16 | 0;
+					d = Math.floor(d / 16);
+					return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
+				});
+			}
+
+			function accordion(element) {
+				let cardBody = element.parentNode.nextElementSibling;
+				if (cardBody.style.display === "none") {
+					cardBody.style.display = "block";
+					return;
+				}
+				cardBody.style.display = "none";
+			}
+			
+			function getDefaultRank4Json() {
+				return {
+					option: "",
+					score: 0,
+				};
+			}
+			function getDefaultRank3Json() {
+				return {
+					question: "",
+					id: uuidGenerator(),
+					rank4List: [getDefaultRank4Json()]
+				};
+			}
+			function getDefaultRank2Json() {
+				return {
+					title: "",
+					rank3List: [getDefaultRank3Json()]
+				};
+			}
+			function getDefaultRank1Json() {
+				return {
+					name: "",
+					id: uuidGenerator(),
+					rank2List: [getDefaultRank2Json()]
+				};
+			};
+			
+			let rootVM = new Vue({
+				el: "#root",
+				data: {
+					copy: false,
+					rank1List: [
+						getDefaultRank1Json()
+					]
+				},
+				methods: {
+					getJson: function() {
+						return JSON.stringify(this.$data);
+					},
+					setJson: function(json) {
+						this.$set(this, 'rank1List', JSON.parse(json).rank1List);
+						this.$nextTick(() => {checkId()});
+					},
+    				addRank1: function() {
+      					this.rank1List.push(getDefaultRank1Json());
+   					},
+					addRank2: function(rank1Index) {
+      					this.rank1List[
+							rank1Index
+						].rank2List.push(getDefaultRank2Json());
+   					},
+					addRank3: function(rank1Index, rank2Index) {
+						this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						].rank3List.push(getDefaultRank3Json());
+   					},
+					addRank4: function(rank1Index, rank2Index, rank3Index) {
+						this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						].rank3List[
+							rank3Index
+						].rank4List.push(getDefaultRank4Json());
+   					},
+					copyRank2: function(rank1Index, rank2Index, rank3Index) {
+						copyTemp = JSON.stringify(this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						].rank3List);
+						this.copy = true;
+					},
+					replaceRank2: function(rank1Index, rank2Index, rank3Index) {
+						replaceData = JSON.parse(copyTemp);
+						replaceData.map((item) => {item.id = uuidGenerator()});
+						this.$set(this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						], "rank3List", replaceData);
+						this.copy = false;
+					},
+					deleteRank1: function(rank1Index) {
+						this.rank1List.splice(rank1Index, 1);
+					},
+					deleteRank2: function(rank1Index, rank2Index) {
+						this.rank1List[
+							rank1Index
+						].rank2List.splice(rank2Index, 1);
+					},
+					deleteRank3: function(rank1Index, rank2Index, rank3Index) {
+						this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						].rank3List.splice(rank3Index, 1);
+					},
+					deleteRank4: function(rank1Index, rank2Index, rank3Index, rank4Index) {
+						this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						].rank3List[
+							rank3Index
+						].rank4List.splice(rank4Index, 1);
+					}
+  				}
+			});
+
+			function showError(errorElemanet) {
+				alert("題目代號重複或空白");
+				let parent = errorElemanet;
+				while (parent.classList) {
+					if (parent.classList.contains("card-body")) {
+						parent.style.display = "block";
+					}
+					parent = parent.parentNode;
+				}
+				errorElemanet.scrollIntoView();
+				errorElemanet.focus();
+				errorElemanet.classList.add("is-invalid");
+			}
+
+			function checkId() {
+				let hash = {};
+				idElemanets = document.getElementsByClassName("idElement");
+				let length = idElemanets.length;
+				for (let index = 0; index < length; index++) {
+					if (hash[idElemanets[index].value] || idElemanets[index].value === "") {
+						showError(idElemanets[index]);
+						return false;
+					}
+					idElemanets[index].classList.remove("is-invalid");
+					hash[idElemanets[index].value] = true;
+				}
+				return true;
+			}
+
+			function outputJson() {
+				if (!checkId()) return;
+				let exportName = "output";
+				let output = "data:text/json;charset=utf-8," + rootVM.getJson();
+				let downloadAnchorNode = document.createElement("a");
+    			downloadAnchorNode.setAttribute("href", output);
+    			downloadAnchorNode.setAttribute("download", exportName + ".json");
+    			document.body.appendChild(downloadAnchorNode); // required for firefox
+    			downloadAnchorNode.click();
+    			downloadAnchorNode.remove();
+			}
+
+			function loadJson(file) {
+				let reader = new FileReader();
+				reader.onload = (function() {
+					rootVM.setJson(reader.result);
+				});
+				reader.readAsText(file);
+			}
+		</script>
+	</body>
+</html>
