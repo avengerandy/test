@@ -169,7 +169,10 @@
 			<div class="container">
 				<div class="row">
 					<div class="col">
-						<a onclick="outputJson()" class="btn btn-primary float-right">output</a>
+						<form class="form-inline float-right">
+							<input class="form-control mr-sm-2" id="outputName" type="text" value="output" aria-label="Search">
+							<a onclick="outputJson()" class="btn btn-primary">output</a>
+						</form>
 					</div>
 				</div>
 			</div>
@@ -229,6 +232,11 @@
 				};
 			};
 			
+			Array.prototype.limitRemove = function (index, limit = 1) {
+				if (this.length <= limit) return;
+				this.splice(index, 1);
+			}
+
 			let rootVM = new Vue({
 				el: "#root",
 				data: {
@@ -291,44 +299,28 @@
 						this.copy = false;
 					},
 					deleteRank1: function(rank1Index) {
-						if (this.rank1List.length === 1) return;
-						this.rank1List.splice(rank1Index, 1);
+						this.rank1List.limitRemove(rank1Index);
 					},
 					deleteRank2: function(rank1Index, rank2Index) {
-						if (this.rank1List[
-							rank1Index
-						].rank2List.length === 1) return;
 						this.rank1List[
 							rank1Index
-						].rank2List.splice(rank2Index, 1);
+						].rank2List.limitRemove(rank2Index);
 					},
 					deleteRank3: function(rank1Index, rank2Index, rank3Index) {
-						if (this.rank1List[
-							rank1Index
-						].rank2List[
-							rank2Index
-						].rank3List.length === 1) return;
 						this.rank1List[
 							rank1Index
 						].rank2List[
 							rank2Index
-						].rank3List.splice(rank3Index, 1);
+						].rank3List.limitRemove(rank3Index);
 					},
 					deleteRank4: function(rank1Index, rank2Index, rank3Index, rank4Index) {
-						if (this.rank1List[
-							rank1Index
-						].rank2List[
-							rank2Index
-						].rank3List[
-							rank3Index
-						].rank4List.length === 1) return;
 						this.rank1List[
 							rank1Index
 						].rank2List[
 							rank2Index
 						].rank3List[
 							rank3Index
-						].rank4List.splice(rank4Index, 1);
+						].rank4List.limitRemove(rank4Index);
 					}
   				}
 			});
@@ -386,7 +378,7 @@
 
 			function outputJson() {
 				if (!checkId()) return;
-				let exportName = "output";
+				let exportName = document.getElementById("outputName").value || "output";
 				let output = "data:text/json;charset=utf-8," + rootVM.getJson();
 				let downloadAnchorNode = document.createElement("a");
     			downloadAnchorNode.setAttribute("href", output);
@@ -399,6 +391,9 @@
 			function loadJson(file) {
 				let reader = new FileReader();
 				reader.onload = (function() {
+					document.getElementById("outputName").value = file.name.substring(
+						0, file.name.lastIndexOf(".")
+					);
 					rootVM.setJson(reader.result);
 				});
 				reader.readAsText(file);
