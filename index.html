@@ -57,7 +57,7 @@
 								</div>
 								<div class="col">
 									<label>代號</label>
-									<input type="text" class="form-control idElement" placeholder="id" v-model="rank1.id">
+									<input type="text" class="form-control idElement rankIdElement" placeholder="id" v-model="rank1.id">
 								</div>
 							</div>
 							<div class="row justify-content-end">
@@ -96,6 +96,20 @@
 																<div class="col">
 																	<label>代號</label>
 																	<input type="text" class="form-control idElement" placeholder="id" v-model="rank3.id">
+																</div>
+															</div>
+															<div class="form-row form-group">
+																<div class="col">
+																	<label>依賴題代號</label>
+																	<input type="text" class="form-control dependIdElemanet" placeholder="依賴題代號" v-model="rank3.dependId">
+																</div>
+																<div class="col">
+																	<label>依賴題分數</label>
+																	<input type="number" class="form-control" placeholder="score" v-model.number="rank3.dependScore">
+																</div>
+																<div class="col">
+																	<label>自動分數</label>
+																	<input type="number" class="form-control" placeholder="score" v-model.number="rank3.autoScore">
 																</div>
 															</div>
 															<div class="form-row form-group justify-content-end">
@@ -161,6 +175,7 @@
 			</div>
 		</div>
 		<script>
+
 			let copyTemp = getDefaultRank3Json();
 
 			function uuidGenerator() {
@@ -194,6 +209,9 @@
 				return {
 					question: "",
 					id: uuidGenerator(),
+					dependId: "",
+					dependScore: 0,
+					autoScore: 0,
 					rank4List: [getDefaultRank4Json()]
 				};
 			}
@@ -261,7 +279,10 @@
 					},
 					replaceRank2: function(rank1Index, rank2Index, rank3Index) {
 						replaceData = JSON.parse(copyTemp);
-						replaceData.map((item) => {item.id = uuidGenerator()});
+						replaceData.map((item) => {
+							item.id = uuidGenerator(),
+							item.dependId = "";
+						});
 						this.$set(this.rank1List[
 							rank1Index
 						].rank2List[
@@ -296,8 +317,8 @@
   				}
 			});
 
-			function showError(errorElemanet) {
-				alert("題目代號重複或空白");
+			function showError(errorElemanet, message) {
+				alert(message);
 				let parent = errorElemanet;
 				while (parent.classList) {
 					if (parent.classList.contains("card-body")) {
@@ -312,15 +333,28 @@
 
 			function checkId() {
 				let hash = {};
+				let rank3Hash = {};
 				idElemanets = document.getElementsByClassName("idElement");
 				let length = idElemanets.length;
 				for (let index = 0; index < length; index++) {
 					if (hash[idElemanets[index].value] || idElemanets[index].value === "") {
-						showError(idElemanets[index]);
+						showError(idElemanets[index], "題目代號重複或空白");
 						return false;
 					}
 					idElemanets[index].classList.remove("is-invalid");
 					hash[idElemanets[index].value] = true;
+					if (!idElemanets[index].classList.contains("rankIdElement")) {
+						rank3Hash[idElemanets[index].value] = true;
+					}
+				}
+				idElemanets = document.getElementsByClassName("dependIdElemanet");
+				length = idElemanets.length;
+				for (let index = 0; index < length; index++) {
+					if (!rank3Hash[idElemanets[index].value] && idElemanets[index].value !== "") {
+						showError(idElemanets[index], "依賴題目代號不存在");
+						return false;
+					}
+					idElemanets[index].classList.remove("is-invalid");
 				}
 				return true;
 			}
@@ -344,6 +378,7 @@
 				});
 				reader.readAsText(file);
 			}
+
 		</script>
 	</body>
 </html>
