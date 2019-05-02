@@ -45,7 +45,7 @@
 				<div class="col-12">
 					<div class="card" v-for="(rank1, rank1Index) in rank1List">
 						<div class="card-header">
-							<a onclick="accordion(this)" class="btn btn-primary">－</a>
+							<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
 							{{ rank1Index + 1 }} - {{rank1.name || "未設定區間名稱"}}
 							<a @click="deleteRank1(rank1Index)" class="btn btn-danger float-right">Ｘ</a>
 						</div>
@@ -64,7 +64,7 @@
 								<div class="col-11">
 									<div class="card" v-for="(rank2, rank2Index) in rank1.rank2List">
 										<div class="card-header">
-											<a onclick="accordion(this)" class="btn btn-primary">－</a>
+											<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
 											{{ rank2Index + 1 }} - {{rank2.title || "未設定大標題"}}
 											<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
 												<a @click="copyRank2(rank1Index, rank2Index)" class="btn btn-info">copy</a>
@@ -83,7 +83,7 @@
 												<div class="col-10">
 													<div class="card" v-for="(rank3, rank3Index) in rank2.rank3List">
 														<div class="card-header">
-															<a onclick="accordion(this)" class="btn btn-primary">－</a>
+															<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
 															{{ rank3Index + 1 }} - {{rank3.question || "未設定問題"}}
 															<a @click="deleteRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-danger float-right">Ｘ</a>
 														</div>
@@ -177,31 +177,13 @@
 				</div>
 			</div>
 		</div>
+		<script src="./uuid.js"></script>
+		<script src="./accordion.js"></script>
 		<script>
+			let copyTempRank1 = getDefaultRank1Json();
+			let copyTempRank2 = getDefaultRank2Json();
+			let copyTempRank3 = getDefaultRank3Json();
 
-			let copyTemp = getDefaultRank3Json();
-
-			function uuidGenerator() {
-				let d = Date.now();
-				if (typeof performance !== "undefined" && typeof performance.now === "function"){
-					d += performance.now(); //use high-precision timer if available
-				}
-				return "xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-					let r = (d + Math.random() * 16) % 16 | 0;
-					d = Math.floor(d / 16);
-					return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
-				});
-			}
-
-			function accordion(element) {
-				let cardBody = element.parentNode.nextElementSibling;
-				if (cardBody.style.display === "none") {
-					cardBody.style.display = "block";
-					return;
-				}
-				cardBody.style.display = "none";
-			}
-			
 			function getDefaultRank4Json() {
 				return {
 					option: "",
@@ -211,7 +193,7 @@
 			function getDefaultRank3Json() {
 				return {
 					question: "",
-					id: uuidGenerator(),
+					id: uuid.uuidGenerator(),
 					dependId: "",
 					dependScore: 0,
 					autoScore: 0,
@@ -227,7 +209,7 @@
 			function getDefaultRank1Json() {
 				return {
 					name: "",
-					id: uuidGenerator(),
+					id: uuid.uuidGenerator(),
 					rank2List: [getDefaultRank2Json()]
 				};
 			};
@@ -250,8 +232,8 @@
 						return JSON.stringify(this.$data);
 					},
 					setJson: function(json) {
-						this.$set(this, 'rank1List', JSON.parse(json).rank1List);
-						this.$nextTick(() => {checkId()});
+						this.$set(this, "rank1List", JSON.parse(json).rank1List);
+						this.$nextTick(() => checkId());
 					},
     				addRank1: function() {
       					this.rank1List.push(getDefaultRank1Json());
@@ -278,7 +260,7 @@
 						].rank4List.push(getDefaultRank4Json());
    					},
 					copyRank2: function(rank1Index, rank2Index, rank3Index) {
-						copyTemp = JSON.stringify(this.rank1List[
+						copyTempRank3 = JSON.stringify(this.rank1List[
 							rank1Index
 						].rank2List[
 							rank2Index
@@ -286,9 +268,9 @@
 						this.copy = true;
 					},
 					replaceRank2: function(rank1Index, rank2Index, rank3Index) {
-						replaceData = JSON.parse(copyTemp);
+						replaceData = JSON.parse(copyTempRank3);
 						replaceData.map((item) => {
-							item.id = uuidGenerator(),
+							item.id = uuid.uuidGenerator(),
 							item.dependId = "";
 						});
 						this.$set(this.rank1List[
@@ -402,3 +384,10 @@
 		</script>
 	</body>
 </html>
+
+<!-- 
+	1 其他階層的copy
+	2 可能有填充題
+	3 試算的分數可以用區間設定
+	4 用戶id跟題目id一樣
+-->
