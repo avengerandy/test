@@ -6,6 +6,10 @@
 		<title>Json</title>
 		<!-- development version, includes helpful console warnings -->
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+		<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+		<!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
 		<style>
 			.footer {
 				background-color: #e9ecef;
@@ -47,7 +51,11 @@
 						<div class="card-header">
 							<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
 							{{ rank1Index + 1 }} - {{rank1.name || "未設定區間名稱"}}
-							<a @click="deleteRank1(rank1Index)" class="btn btn-danger float-right">Ｘ</a>
+							<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+								<a @click="copyRank1(rank1Index)" class="btn btn-info">copy</a>
+								<a v-if="isCopy1" @click="replaceRank1(rank1Index)" class="btn btn-success">replace</a>
+								<a @click="deleteRank1(rank1Index)" class="btn btn-danger">Ｘ</a>
+							</div>
 						</div>
 						<div class="card-body">
 							<div class="form-row form-group">
@@ -68,7 +76,7 @@
 											{{ rank2Index + 1 }} - {{rank2.title || "未設定大標題"}}
 											<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
 												<a @click="copyRank2(rank1Index, rank2Index)" class="btn btn-info">copy</a>
-												<a v-if="copy" @click="replaceRank2(rank1Index, rank2Index)" class="btn btn-success">replace</a>
+												<a v-if="isCopy2" @click="replaceRank2(rank1Index, rank2Index)" class="btn btn-success">replace</a>
 												<a @click="deleteRank2(rank1Index, rank2Index)" class="btn btn-danger float-right">Ｘ</a>
 											</div>
 										</div>
@@ -84,8 +92,12 @@
 													<div class="card" v-for="(rank3, rank3Index) in rank2.rank3List">
 														<div class="card-header">
 															<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
-															{{ rank3Index + 1 }} - {{rank3.question || "未設定問題"}}
-															<a @click="deleteRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-danger float-right">Ｘ</a>
+															{{ rank3Index + 1 }} - {{rank3.id || "未設定代號"}} - {{rank3.question || "未設定問題"}}
+															<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+																<a @click="copyRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-info">copy</a>
+																<a v-if="isCopy3" @click="replaceRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-success">replace</a>
+																<a @click="deleteRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-danger">Ｘ</a>
+															</div>
 														</div>
 														<div class="card-body">
 															<div class="form-row form-group">
@@ -180,9 +192,9 @@
 		<script src="./uuid.js"></script>
 		<script src="./accordion.js"></script>
 		<script>
-			let copyTempRank1 = getDefaultRank1Json();
 			let copyTempRank2 = getDefaultRank2Json();
 			let copyTempRank3 = getDefaultRank3Json();
+			let copyTempRank4 = getDefaultRank4Json();
 
 			function getDefaultRank4Json() {
 				return {
@@ -222,7 +234,9 @@
 			let rootVM = new Vue({
 				el: "#root",
 				data: {
-					copy: false,
+					isCopy1: false,
+					isCopy2: false,
+					isCopy3: false,
 					rank1List: [
 						getDefaultRank1Json()
 					]
@@ -259,15 +273,36 @@
 							rank3Index
 						].rank4List.push(getDefaultRank4Json());
    					},
-					copyRank2: function(rank1Index, rank2Index, rank3Index) {
+					copyRank3: function(rank1Index, rank2Index, rank3Index) {
+						copyTempRank4 = JSON.stringify(this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						].rank3List[
+							rank3Index
+						].rank4List);
+						this.isCopy3 = true;
+					},
+					replaceRank3: function(rank1Index, rank2Index, rank3Index) {
+						replaceData = JSON.parse(copyTempRank4);
+						this.$set(this.rank1List[
+							rank1Index
+						].rank2List[
+							rank2Index
+						].rank3List[
+							rank3Index
+						], "rank4List", replaceData);
+						this.isCopy3 = false;
+					},
+					copyRank2: function(rank1Index, rank2Index) {
 						copyTempRank3 = JSON.stringify(this.rank1List[
 							rank1Index
 						].rank2List[
 							rank2Index
 						].rank3List);
-						this.copy = true;
+						this.isCopy2 = true;
 					},
-					replaceRank2: function(rank1Index, rank2Index, rank3Index) {
+					replaceRank2: function(rank1Index, rank2Index) {
 						replaceData = JSON.parse(copyTempRank3);
 						replaceData.map((item) => {
 							item.id = uuid.uuidGenerator(),
@@ -278,7 +313,26 @@
 						].rank2List[
 							rank2Index
 						], "rank3List", replaceData);
-						this.copy = false;
+						this.isCopy2 = false;
+					},
+					copyRank1: function(rank1Index) {
+						copyTempRank2 = JSON.stringify(this.rank1List[
+							rank1Index
+						].rank2List);
+						this.isCopy1 = true;
+					},
+					replaceRank1: function(rank1Index) {
+						replaceData = JSON.parse(copyTempRank2);
+						replaceData.map((item) => {
+							item.rank3List.map((rank3Item) => {
+								rank3Item.id = uuid.uuidGenerator(),
+								rank3Item.dependId = "";
+							});
+						});
+						this.$set(this.rank1List[
+							rank1Index
+						], "rank2List", replaceData);
+						this.isCopy1 = false;
 					},
 					deleteRank1: function(rank1Index) {
 						this.rank1List.limitRemove(rank1Index);
