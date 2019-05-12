@@ -10,6 +10,7 @@
 		<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
 		<!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 		<style>
 			.footer {
 				background-color: #e9ecef;
@@ -47,128 +48,137 @@
 		<div class="container" id="root">
 			<div class="row">
 				<div class="col-12">
-					<div class="card" v-for="(rank1, rank1Index) in rank1List">
-						<div class="card-header">
-							<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
-							{{ rank1Index + 1 }} - {{rank1.name || "未設定區間名稱"}}
-							<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-								<a @click="copyRank1(rank1Index)" class="btn btn-info">copy</a>
-								<a v-if="isCopy1" @click="replaceRank1(rank1Index)" class="btn btn-success">replace</a>
-								<a @click="deleteRank1(rank1Index)" class="btn btn-danger">Ｘ</a>
-							</div>
-						</div>
-						<div class="card-body">
-							<div class="form-row form-group">
-								<div class="col">
-									<label>名稱</label>
-									<input type="text" class="form-control" placeholder="區間名稱" v-model="rank1.name">
-								</div>
-								<div class="col">
-									<label>代號</label>
-									<input type="text" class="form-control idElement rankIdElement" placeholder="id" v-model="rank1.id">
+					<draggable v-model="rank1List" handle=".handleRank1">
+						<div class="card" v-for="(rank1, rank1Index) in rank1List">
+							<div class="card-header">
+								<a onclick="accordion.binding(this)" class="btn btn-primary"><i class="material-icons">exposure</i></a>
+								{{ rank1Index + 1 }} - {{rank1.name || "未設定區間名稱"}}
+								<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+									<a @click="copyRank1(rank1Index)" class="btn btn-info"><i class="material-icons">file_copy</i></a>
+									<a v-if="isCopy1" @click="replaceRank1(rank1Index)" class="btn btn-success"><i class="material-icons"></i>reply</i></a>
+									<a class="btn btn-primary handleRank1"><i class="material-icons">swap_vert</i></a>
+									<a @click="deleteRank1(rank1Index)" class="btn btn-danger"><i class="material-icons">close</i></a>
 								</div>
 							</div>
-							<div class="row justify-content-end">
-								<div class="col-11">
-									<div class="card" v-for="(rank2, rank2Index) in rank1.rank2List">
-										<div class="card-header">
-											<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
-											{{ rank2Index + 1 }} - {{rank2.title || "未設定大標題"}}
-											<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-												<a @click="copyRank2(rank1Index, rank2Index)" class="btn btn-info">copy</a>
-												<a v-if="isCopy2" @click="replaceRank2(rank1Index, rank2Index)" class="btn btn-success">replace</a>
-												<a @click="deleteRank2(rank1Index, rank2Index)" class="btn btn-danger float-right">Ｘ</a>
-											</div>
-										</div>
-										<div class="card-body">
-											<div class="form-row form-group">
-												<div class="col">
-													<label>大標題</label>
-													<input type="text" class="form-control" placeholder="中文標題" v-model="rank2.title">
+							<div class="card-body">
+								<div class="form-row form-group">
+									<div class="col">
+										<label>名稱</label>
+										<input type="text" class="form-control" placeholder="區間名稱" v-model="rank1.name">
+									</div>
+									<div class="col">
+										<label>代號</label>
+										<input type="text" class="form-control idElement rankIdElement" placeholder="id" v-model="rank1.id">
+									</div>
+								</div>
+								<div class="row justify-content-end">
+									<div class="col-11">
+										<draggable v-model="rank1.rank2List" handle=".handleRank2">
+											<div class="card" v-for="(rank2, rank2Index) in rank1.rank2List">
+												<div class="card-header">
+													<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
+													{{ rank2Index + 1 }} - {{rank2.title || "未設定大標題"}}
+													<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+														<a @click="copyRank2(rank1Index, rank2Index)" class="btn btn-info">copy</a>
+														<a v-if="isCopy2" @click="replaceRank2(rank1Index, rank2Index)" class="btn btn-success">replace</a>
+														<a class="btn btn-primary handleRank2">move</a>
+														<a @click="deleteRank2(rank1Index, rank2Index)" class="btn btn-danger float-right">Ｘ</a>
+													</div>
 												</div>
-											</div>
-											<div class="row justify-content-end">
-												<div class="col-10">
-													<div class="card" v-for="(rank3, rank3Index) in rank2.rank3List">
-														<div class="card-header">
-															<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
-															{{ rank3Index + 1 }} - {{rank3.id || "未設定代號"}} - {{rank3.question || "未設定問題"}}
-															<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-																<a @click="copyRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-info">copy</a>
-																<a v-if="isCopy3" @click="replaceRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-success">replace</a>
-																<a @click="deleteRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-danger">Ｘ</a>
-															</div>
+												<div class="card-body">
+													<div class="form-row form-group">
+														<div class="col">
+															<label>大標題</label>
+															<input type="text" class="form-control" placeholder="中文標題" v-model="rank2.title">
 														</div>
-														<div class="card-body">
-															<div class="form-row form-group">
-																<div class="col-10">
-																	<label>標題</label>
-																	<input type="text" class="form-control" placeholder="問題" v-model="rank3.question">
+													</div>
+													<div class="row justify-content-end">
+														<div class="col-10">
+															<draggable v-model="rank2.rank3List" handle=".handleRank3">
+																<div class="card" v-for="(rank3, rank3Index) in rank2.rank3List">
+																	<div class="card-header">
+																		<a onclick="accordion.binding(this)" class="btn btn-primary">－</a>
+																		{{ rank3Index + 1 }} - {{rank3.id || "未設定代號"}} - {{rank3.question || "未設定問題"}}
+																		<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+																			<a @click="copyRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-info">copy</a>
+																			<a v-if="isCopy3" @click="replaceRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-success">replace</a>
+																			<a class="btn btn-primary handleRank3">move</a>
+																			<a @click="deleteRank3(rank1Index, rank2Index, rank3Index)" class="btn btn-danger">Ｘ</a>
+																		</div>
+																	</div>
+																	<div class="card-body">
+																		<div class="form-row form-group">
+																			<div class="col-10">
+																				<label>標題</label>
+																				<input type="text" class="form-control" placeholder="問題" v-model="rank3.question">
+																			</div>
+																			<div class="col">
+																				<label>代號</label>
+																				<input type="text" class="form-control idElement" placeholder="id" v-model="rank3.id">
+																			</div>
+																		</div>
+																		<div class="form-row form-group">
+																			<div class="col">
+																				<label>依賴題代號</label>
+																				<input type="text" class="form-control dependIdElemanet" placeholder="依賴題代號" v-model="rank3.dependId">
+																			</div>
+																			<div class="col">
+																				<label>依賴題分數</label>
+																				<input type="number" class="form-control" placeholder="score" v-model.number="rank3.dependScore">
+																			</div>
+																			<div class="col">
+																				<label>自動分數</label>
+																				<input type="number" class="form-control" placeholder="score" v-model.number="rank3.autoScore">
+																			</div>
+																		</div>
+																		<div class="form-row form-group justify-content-end">
+																			<div class="col-8">
+																				<label>選項</label>
+																			</div>
+																			<div class="col-2">
+																				<label>分數</label>
+																			</div>
+																			<div class="col-1"></div>
+																		</div>
+																		<div class="form-row form-group justify-content-end" v-for="(rank4, rank4Index) in rank3.rank4List">
+																			<div class="col-8">
+																				<input type="text" class="form-control" placeholder="選項" v-model="rank4.option">
+																			</div>
+																			<div class="col-2">
+																				<input type="number" class="form-control" placeholder="score" v-model.number="rank4.score">
+																			</div>
+																			<div class="col-1">
+																				<a @click="deleteRank4(rank1Index, rank2Index, rank3Index, rank4Index)" class="btn btn-danger float-right">Ｘ</a>
+																			</div>
+																		</div>
+																		<div class="row justify-content-end">
+																			<div class="col-11">
+																				<a @click="addRank4(rank1Index, rank2Index, rank3Index)" class="btn btn-primary btn-block">＋</a>
+																			</div>
+																		</div>
+																	</div>
 																</div>
-																<div class="col">
-																	<label>代號</label>
-																	<input type="text" class="form-control idElement" placeholder="id" v-model="rank3.id">
-																</div>
-															</div>
-															<div class="form-row form-group">
-																<div class="col">
-																	<label>依賴題代號</label>
-																	<input type="text" class="form-control dependIdElemanet" placeholder="依賴題代號" v-model="rank3.dependId">
-																</div>
-																<div class="col">
-																	<label>依賴題分數</label>
-																	<input type="number" class="form-control" placeholder="score" v-model.number="rank3.dependScore">
-																</div>
-																<div class="col">
-																	<label>自動分數</label>
-																	<input type="number" class="form-control" placeholder="score" v-model.number="rank3.autoScore">
-																</div>
-															</div>
-															<div class="form-row form-group justify-content-end">
-																<div class="col-8">
-																	<label>選項</label>
-																</div>
-																<div class="col-2">
-																	<label>分數</label>
-																</div>
-																<div class="col-1"></div>
-															</div>
-															<div class="form-row form-group justify-content-end" v-for="(rank4, rank4Index) in rank3.rank4List">
-																<div class="col-8">
-																	<input type="text" class="form-control" placeholder="選項" v-model="rank4.option">
-																</div>
-																<div class="col-2">
-																	<input type="number" class="form-control" placeholder="score" v-model.number="rank4.score">
-																</div>
-																<div class="col-1">
-																	<a @click="deleteRank4(rank1Index, rank2Index, rank3Index, rank4Index)" class="btn btn-danger float-right">Ｘ</a>
-																</div>
-															</div>
-															<div class="row justify-content-end">
-																<div class="col-11">
-																	<a @click="addRank4(rank1Index, rank2Index, rank3Index)" class="btn btn-primary btn-block">＋</a>
-																</div>
-															</div>
+															</draggable>
+														</div>
+													</div>
+													<div class="row justify-content-end">
+														<div class="col-10">
+															<a @click="addRank3(rank1Index, rank2Index)" class="btn btn-primary btn-block">＋</a>
 														</div>
 													</div>
 												</div>
 											</div>
-											<div class="row justify-content-end">
-												<div class="col-10">
-													<a @click="addRank3(rank1Index, rank2Index)" class="btn btn-primary btn-block">＋</a>
-												</div>
-											</div>
-										</div>
+										</draggable>
+									</div>
+								</div>
+								<div class="row justify-content-end">
+									<div class="col-11">
+										<a @click="addRank2(rank1Index)" class="btn btn-primary btn-block">＋</a>
 									</div>
 								</div>
 							</div>
-							<div class="row justify-content-end">
-								<div class="col-11">
-									<a @click="addRank2(rank1Index)" class="btn btn-primary btn-block">＋</a>
-								</div>
-							</div>
-						</div>
-					</div>				
+						</div>	
+					</draggable>			
 				</div>
 			</div>
 			<div class="row">
