@@ -48,6 +48,11 @@
 		<div class="container" id="root">
 			<div class="row">
 				<div class="col-12">
+					<h1>問題區</h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
 					<draggable v-model="rank1List" handle=".handleRank1">
 						<div class="card" v-for="(rank1, rank1Index) in rank1List">
 							<div class="card-header">
@@ -186,6 +191,47 @@
 					<a @click="addRank1" class="btn btn-primary btn-block">＋</a>
 				</div>
 			</div>
+			<hr>
+			<div class="row">
+				<div class="col-12">
+					<h1>分數區</h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<div class="card"  v-for="(score, index) in scoreList">
+						<div class="card-header">
+							<a onclick="accordion.binding(this)" class="btn btn-primary"><i class="material-icons">exposure</i></a>
+							{{ index + 1 }} - {{score.id || "未設定代號"}}
+							<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+								<a class="btn btn-primary"><i class="material-icons">swap_vert</i></a>
+								<a class="btn btn-danger"><i class="material-icons">close</i></a>
+							</div>
+						</div>
+						<div class="card-body">
+							<form>
+								<div class="form-group form-row">
+									<div class="col">
+										<label>代號</label>
+										<input type="text" class="form-control" placeholder="代號" v-model="score.id">
+										<label>測試分數</label>
+										<input type="text" class="form-control" placeholder="代號" v-model="score.testScore">
+									</div>
+									<div class="col">
+										<label>計算程式</label>
+										<textarea v-model="score.luaCode" placeholder="lua code" class="form-control" rows="3"></textarea>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<a @click="" class="btn btn-primary btn-block">＋</a>
+				</div>
+			</div>
 		</div>
 		<div class="container-fluid footer">
 			<div class="container">
@@ -234,7 +280,14 @@
 					id: uuid.uuidGenerator(),
 					rank2List: [getDefaultRank2Json()]
 				};
-			};
+			}
+			function getDefaultScoreJson() {
+				return {
+					id: uuid.uuidGenerator(),
+					luaCode: "",
+					testScore: 0
+				};
+			}
 			
 			Array.prototype.limitRemove = function (index, limit = 1) {
 				if (this.length <= limit) return;
@@ -249,6 +302,10 @@
 					isCopy3: false,
 					rank1List: [
 						getDefaultRank1Json()
+					],
+					scoreList: [
+						getDefaultScoreJson(),
+						getDefaultScoreJson()
 					]
 				},
 				methods: {
@@ -450,7 +507,6 @@
 </html>
 
 <!-- 
-	1 其他階層的copy
 	2 可能有填充題
 	3 試算的分數可以用區間設定
 	4 用戶id跟題目id一樣
