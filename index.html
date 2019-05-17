@@ -199,37 +199,39 @@
 			</div>
 			<div class="row">
 				<div class="col-12">
-					<div class="card"  v-for="(score, index) in scoreList">
-						<div class="card-header">
-							<a onclick="accordion.binding(this)" class="btn btn-primary"><i class="material-icons">exposure</i></a>
-							{{ index + 1 }} - {{score.id || "未設定代號"}}
-							<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-								<a class="btn btn-primary"><i class="material-icons">swap_vert</i></a>
-								<a class="btn btn-danger"><i class="material-icons">close</i></a>
+					<draggable v-model="scoreList" handle=".handleScore">
+						<div class="card" v-for="(score, scoreIndex) in scoreList">
+							<div class="card-header">
+								<a onclick="accordion.binding(this)" class="btn btn-primary"><i class="material-icons">exposure</i></a>
+								{{ scoreIndex + 1 }} - {{score.id || "未設定代號"}}
+								<div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
+									<a class="btn btn-primary handleScore"><i class="material-icons">swap_vert</i></a>
+									<a @click="deleteScore(scoreIndex)" class="btn btn-danger"><i class="material-icons">close</i></a>
+								</div>
+							</div>
+							<div class="card-body">
+								<form>
+									<div class="form-group form-row">
+										<div class="col">
+											<label>代號</label>
+											<input type="text" class="form-control" placeholder="代號" v-model="score.id">
+											<label>測試分數</label>
+											<input type="text" class="form-control" placeholder="代號" v-model="score.testScore">
+										</div>
+										<div class="col">
+											<label>計算程式</label>
+											<textarea v-model="score.luaCode" placeholder="lua code" class="form-control" rows="3"></textarea>
+										</div>
+									</div>
+								</form>
 							</div>
 						</div>
-						<div class="card-body">
-							<form>
-								<div class="form-group form-row">
-									<div class="col">
-										<label>代號</label>
-										<input type="text" class="form-control" placeholder="代號" v-model="score.id">
-										<label>測試分數</label>
-										<input type="text" class="form-control" placeholder="代號" v-model="score.testScore">
-									</div>
-									<div class="col">
-										<label>計算程式</label>
-										<textarea v-model="score.luaCode" placeholder="lua code" class="form-control" rows="3"></textarea>
-									</div>
-								</div>
-							</form>
-						</div>
-					</div>
+					</draggable>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col">
-					<a @click="" class="btn btn-primary btn-block">＋</a>
+					<a @click="addScore" class="btn btn-primary btn-block">＋</a>
 				</div>
 			</div>
 		</div>
@@ -303,10 +305,7 @@
 					rank1List: [
 						getDefaultRank1Json()
 					],
-					scoreList: [
-						getDefaultScoreJson(),
-						getDefaultScoreJson()
-					]
+					scoreList: []
 				},
 				methods: {
 					getJson: function() {
@@ -424,6 +423,12 @@
 						].rank3List[
 							rank3Index
 						].rank4List.limitRemove(rank4Index);
+					},
+					addScore: function() {
+						this.scoreList.push(getDefaultScoreJson());
+					},
+					deleteScore: function(scoreIndex) {
+						this.scoreList.splice(scoreIndex, 1);
 					}
   				}
 			});
