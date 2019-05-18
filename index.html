@@ -100,7 +100,7 @@
 									</div>
 									<div class="col">
 										<label>測試分數</label>
-										<input type="number" class="form-control" placeholder="id" v-model="rank1.testScore">
+										<input type="number" class="form-control" placeholder="id" v-model.number="rank1.testScore">
 									</div>
 								</div>
 								<div class="row justify-content-end">
@@ -243,7 +243,7 @@
 											<label>代號</label>
 											<input type="text" class="form-control" placeholder="代號" v-model="score.id">
 											<label>測試分數</label>
-											<input type="text" class="form-control" placeholder="代號" v-model="score.testScore">
+											<input type="text" class="form-control" placeholder="代號" v-model.number="score.testScore">
 										</div>
 										<div class="col">
 											<label>計算程式<a @click="runScore(scoreIndex)" class="btn btn-danger">test</a></label>
@@ -276,6 +276,8 @@
 		</div>
 		<script src="./uuid.js"></script>
 		<script src="./accordion.js"></script>
+		<script src="./limitRemove.js"></script>
+		<script src="./fengari-web.js"></script>
 		<script>
 			let copyTempRank2 = getDefaultRank2Json();
 			let copyTempRank3 = getDefaultRank3Json();
@@ -317,11 +319,6 @@
 					luaCode: "",
 					testScore: 0
 				};
-			}
-			
-			Array.prototype.limitRemove = function (index, limit = 1) {
-				if (this.length <= limit) return;
-				this.splice(index, 1);
 			}
 
 			let rootVM = new Vue({
@@ -459,7 +456,7 @@
 						this.scoreList.splice(scoreIndex, 1);
 					},
 					runScore: function(scoreIndex) {
-						runCode (
+						this.scoreList[scoreIndex].testScore = runCode (
 							this.scoreList[scoreIndex].luaCode, 
 							this.scoreList[scoreIndex].id
 						);
@@ -554,7 +551,13 @@
 			}
 
 			function runCode(code, returnVar) {
-				console.log(getVarCode() + code + "\nreturn " + returnVar);
+				let result = 0;
+				try {
+					result = fengari.load(getVarCode() + code + "\nreturn " + returnVar)()
+				} catch (error) {
+					console.log(error);
+				}
+				return result || 0;
 			}
 		</script>
 	</body>
