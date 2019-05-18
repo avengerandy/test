@@ -98,6 +98,10 @@
 										<label>代號</label>
 										<input type="text" class="form-control idElement rankIdElement" placeholder="id" v-model="rank1.id">
 									</div>
+									<div class="col">
+										<label>測試分數</label>
+										<input type="number" class="form-control" placeholder="id" v-model="rank1.testScore">
+									</div>
 								</div>
 								<div class="row justify-content-end">
 									<div class="col-11">
@@ -242,7 +246,7 @@
 											<input type="text" class="form-control" placeholder="代號" v-model="score.testScore">
 										</div>
 										<div class="col">
-											<label>計算程式</label>
+											<label>計算程式<a @click="runScore(scoreIndex)" class="btn btn-danger">test</a></label>
 											<textarea v-model="score.luaCode" placeholder="lua code" class="form-control" rows="3"></textarea>
 										</div>
 									</div>
@@ -302,6 +306,7 @@
 			function getDefaultRank1Json() {
 				return {
 					name: "",
+					testScore: 0,
 					id: uuid.uuidGenerator(),
 					rank2List: [getDefaultRank2Json()]
 				};
@@ -452,6 +457,12 @@
 					},
 					deleteScore: function(scoreIndex) {
 						this.scoreList.splice(scoreIndex, 1);
+					},
+					runScore: function(scoreIndex) {
+						runCode (
+							this.scoreList[scoreIndex].luaCode, 
+							this.scoreList[scoreIndex].id
+						);
 					}
   				}
 			});
@@ -530,6 +541,21 @@
 				reader.readAsText(file);
 			}
 
+			function getVarCode() {
+				let varCode = "";
+				rootVM.rank1List.forEach(rank1Element => {
+					rank1Element.rank2List.forEach(rank2Element => {
+						rank2Element.rank3List.forEach(rank3Element => {
+							varCode += rank3Element.id + " = " + rank1Element.testScore + "\n";
+						});
+					}); 
+				});
+				return varCode;
+			}
+
+			function runCode(code, returnVar) {
+				console.log(getVarCode() + code + "\nreturn " + returnVar);
+			}
 		</script>
 	</body>
 </html>
