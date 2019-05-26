@@ -61,7 +61,7 @@
 						<div class="card-body">
 							<div class="form-row form-group">
 								<div class="col">
-									<textarea placeholder="提前說明" class="form-control" rows="5"></textarea>
+									<textarea v-model="description" placeholder="提前說明" class="form-control" rows="5"></textarea>
 								</div>
 							</div>
 						</div>
@@ -329,6 +329,7 @@
 					isCopy1: false,
 					isCopy2: false,
 					isCopy3: false,
+					description: "",
 					rank1List: [
 						getDefaultRank1Json()
 					],
