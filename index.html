@@ -278,6 +278,7 @@
 		<script src="./accordion.js"></script>
 		<script src="./limitRemove.js"></script>
 		<script src="./fengari-web.js"></script>
+		<script src="./luaInterpreter.js"></script>
 		<script>
 			let copyTempRank2 = getDefaultRank2Json();
 			let copyTempRank3 = getDefaultRank3Json();
@@ -455,11 +456,23 @@
 					deleteScore: function(scoreIndex) {
 						this.scoreList.splice(scoreIndex, 1);
 					},
+					getVarCode: function () {
+						let varCode = "";
+						rootVM.rank1List.forEach(rank1Element => {
+							rank1Element.rank2List.forEach(rank2Element => {
+								rank2Element.rank3List.forEach(rank3Element => {
+									varCode += rank3Element.id + " = " + rank1Element.testScore + "\n";
+								});
+							});
+						});
+						return varCode;
+					},
 					runScore: function(scoreIndex) {
-						this.scoreList[scoreIndex].testScore = runCode (
-							this.scoreList[scoreIndex].luaCode, 
+						let result = luaInterpreter.runCode (
+							this.getVarCode() + this.scoreList[scoreIndex].luaCode, 
 							this.scoreList[scoreIndex].id
 						);
+						this.scoreList[scoreIndex].testScore = result.result;
 					}
   				}
 			});
@@ -537,34 +550,6 @@
 				});
 				reader.readAsText(file);
 			}
-
-			function getVarCode() {
-				let varCode = "";
-				rootVM.rank1List.forEach(rank1Element => {
-					rank1Element.rank2List.forEach(rank2Element => {
-						rank2Element.rank3List.forEach(rank3Element => {
-							varCode += rank3Element.id + " = " + rank1Element.testScore + "\n";
-						});
-					}); 
-				});
-				return varCode;
-			}
-
-			function runCode(code, returnVar) {
-				let result = 0;
-				try {
-					result = fengari.load(getVarCode() + code + "\nreturn " + returnVar)()
-				} catch (error) {
-					console.log(error);
-				}
-				return result || 0;
-			}
 		</script>
 	</body>
 </html>
-
-<!-- 
-	2 可能有填充題
-	3 試算的分數可以用區間設定
-	4 用戶id跟題目id一樣
--->
