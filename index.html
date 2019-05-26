@@ -39,7 +39,7 @@
 					<label for="jsonUpload" class="uploadLabel">
 						<div class="col">
 							open json file
-							<input type="file" accept="text/json" class="form-control-file" id="jsonUpload" onchange="loadJson(this.files[0])">
+							<input type="file" accept="text/json" class="form-control-file" id="jsonUpload" onchange="json.loadJson(this.files[0])">
 						</div>
 					</label>
 				</div>
@@ -268,7 +268,7 @@
 					<div class="col">
 						<form class="form-inline float-right">
 							<input class="form-control mr-sm-2" id="outputName" type="text" value="output" aria-label="Search">
-							<a onclick="outputJson()" class="btn btn-primary">output</a>
+							<a onclick="json.outputJson(checkId)" class="btn btn-primary">output</a>
 						</form>
 					</div>
 				</div>
@@ -279,6 +279,7 @@
 		<script src="./limitRemove.js"></script>
 		<script src="./fengari-web.js"></script>
 		<script src="./luaInterpreter.js"></script>
+		<script src="./json.js"></script>
 		<script>
 			let copyTempRank2 = getDefaultRank2Json();
 			let copyTempRank3 = getDefaultRank3Json();
@@ -527,29 +528,7 @@
 				}
 				return true;
 			}
-
-			function outputJson() {
-				if (!checkId()) return;
-				let exportName = document.getElementById("outputName").value || "output";
-				let output = "data:text/json;charset=utf-8," + rootVM.getJson();
-				let downloadAnchorNode = document.createElement("a");
-    			downloadAnchorNode.setAttribute("href", output);
-    			downloadAnchorNode.setAttribute("download", exportName + ".json");
-    			document.body.appendChild(downloadAnchorNode); // required for firefox
-    			downloadAnchorNode.click();
-    			downloadAnchorNode.remove();
-			}
-
-			function loadJson(file) {
-				let reader = new FileReader();
-				reader.onload = (function() {
-					document.getElementById("outputName").value = file.name.substring(
-						0, file.name.lastIndexOf(".")
-					);
-					rootVM.setJson(reader.result);
-				});
-				reader.readAsText(file);
-			}
+			
 		</script>
 	</body>
 </html>
