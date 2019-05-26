@@ -243,11 +243,15 @@
 											<label>代號</label>
 											<input type="text" class="form-control" placeholder="代號" v-model="score.id">
 											<label>測試分數</label>
-											<input type="text" class="form-control" placeholder="代號" v-model.number="score.testScore">
+											<input type="text" class="form-control" placeholder="代號" v-model.number="score.testScoreResult">
 										</div>
 										<div class="col">
-											<label>計算程式<a @click="runScore(scoreIndex)" class="btn btn-danger">test</a></label>
+											<label>計算程式&emsp;<a @click="runScore(scoreIndex)" class="btn btn-primary">test</a></label>
 											<textarea v-model="score.luaCode" placeholder="lua code" class="form-control" rows="3"></textarea>
+										</div>
+										<div class="col">
+											<label>錯誤訊息</label>
+											<textarea v-model="score.errorMsg" placeholder="無錯誤" class="form-control" rows="3"></textarea>
 										</div>
 									</div>
 								</form>
@@ -319,7 +323,8 @@
 				return {
 					id: uuid.uuidGenerator(),
 					luaCode: "",
-					testScore: 0
+					testScoreResult: 0,
+					errorMsg: ""
 				};
 			}
 
@@ -474,7 +479,9 @@
 							this.getVarCode() + this.scoreList[scoreIndex].luaCode, 
 							this.scoreList[scoreIndex].id
 						);
-						this.scoreList[scoreIndex].testScore = result.result;
+						this.scoreList[scoreIndex].testScoreResult = result.result;
+						let errorMsg = result.error.name + result.error.message;
+						this.scoreList[scoreIndex].errorMsg = errorMsg || "";
 					}
   				}
 			});
