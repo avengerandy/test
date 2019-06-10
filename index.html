@@ -346,6 +346,8 @@
 					},
 					setJson: function(json) {
 						this.$set(this, "rank1List", JSON.parse(json).rank1List);
+						this.$set(this, "description", JSON.parse(json).description);
+						this.$set(this, "scoreList", JSON.parse(json).scoreList);
 						this.$nextTick(() => checkId());
 					},
     				addRank1: function() {
