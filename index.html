@@ -48,7 +48,7 @@
 		<div class="container" id="root">
 			<div class="row">
 				<div class="col-12">
-					<h1>說明區</h1>
+					<h1>基本設定區</h1>
 				</div>
 			</div>
 			<div class="row">
@@ -62,6 +62,16 @@
 							<div class="form-row form-group">
 								<div class="col">
 									<textarea v-model="description" placeholder="提前說明" class="form-control" rows="5"></textarea>
+								</div>
+							</div>
+							<div class="form-row form-group">
+								<div class="col">
+									<label>用戶欄位名稱</label>
+									<input type="text" class="form-control" placeholder="userID" v-model="subjectColName">
+								</div>
+								<div class="col">
+									<label>預設分數</label>
+									<input type="number" class="form-control" placeholder="id" v-model.number="defaultValue">
 								</div>
 							</div>
 						</div>
@@ -335,6 +345,8 @@
 					isCopy2: false,
 					isCopy3: false,
 					description: "",
+					defaultValue: 999, 
+					subjectColName: "ID", 
 					rank1List: [
 						getDefaultRank1Json()
 					],
@@ -345,9 +357,14 @@
 						return JSON.stringify(this.$data);
 					},
 					setJson: function(json) {
-						this.$set(this, "rank1List", JSON.parse(json).rank1List);
-						this.$set(this, "description", JSON.parse(json).description);
-						this.$set(this, "scoreList", JSON.parse(json).scoreList);
+						json = JSON.parse(json);
+						this.$set(this, "rank1List", json.rank1List);
+						this.$set(this, "description", json.description);
+						this.$set(this, "scoreList", json.scoreList);
+						if (json.defaultValue == undefined) json.defaultValue = 999;
+						if (json.subjectColName == undefined) json.subjectColName = "ID";
+						this.$set(this, "defaultValue", json.defaultValue);
+						this.$set(this, "subjectColName", json.subjectColName);
 						this.$nextTick(() => checkId());
 					},
     				addRank1: function() {
