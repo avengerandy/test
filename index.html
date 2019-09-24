@@ -529,8 +529,8 @@
 						showError(idElemanets[index], "題目代號重複或空白");
 						return false;
 					}
-					if (!/^[_A-Za-z0-9]+$/.test(idElemanets[index].value)) {
-						showError(idElemanets[index], "題目代號只能是英文與數字");
+					if (!/^[A-Za-z][_A-Za-z0-9]+$/.test(idElemanets[index].value)) {
+						showError(idElemanets[index], "題目代號只能是英文與數字、並且英文開頭");
 						return false;
 					}
 					idElemanets[index].classList.remove("is-invalid");
@@ -548,8 +548,8 @@
 					}
 					let ownId = idElemanets[index].parentNode.parentNode.parentNode.getElementsByClassName("idElement")[0].value;
 					if (ownId === idElemanets[index].value) {
-						showError(idElemanets[index], "依賴題目不得為自己");
-						return false;
+						// showError(idElemanets[index], "依賴題目不得為自己");
+						// return false;
 					}
 					idElemanets[index].classList.remove("is-invalid");
 				}
